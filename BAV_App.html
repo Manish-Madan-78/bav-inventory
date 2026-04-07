@@ -26,34 +26,34 @@
    DESIGN TOKENS
 ═══════════════════════════════════════ */
 :root {
-  --bg:           #0D0B09;
-  --surface-1:    #161310;
-  --surface-2:    #1E1A15;
-  --surface-3:    #28231C;
-  --surface-4:    #322C24;
+  --bg:           #F4EFE6;
+  --surface-1:    #FFFFFF;
+  --surface-2:    #EDE6DA;
+  --surface-3:    #E2D9CB;
+  --surface-4:    #D5CBBA;
 
-  --gold:         #C8953A;
-  --gold-bright:  #E0AA4C;
-  --gold-muted:   #8C6828;
-  --gold-dim:     rgba(200,149,58,0.10);
-  --gold-border:  rgba(200,149,58,0.20);
-  --gold-glow:    rgba(200,149,58,0.06);
+  --gold:         #A06E20;
+  --gold-bright:  #C8882A;
+  --gold-muted:   #C8A060;
+  --gold-dim:     rgba(160,110,32,0.10);
+  --gold-border:  rgba(160,110,32,0.25);
+  --gold-glow:    rgba(160,110,32,0.06);
 
-  --text-1:       #EDE5D8;
-  --text-2:       #A0917C;
-  --text-3:       #5C5044;
-  --border:       rgba(255,255,255,0.06);
+  --text-1:       #2A1F10;
+  --text-2:       #6B5438;
+  --text-3:       #A08868;
+  --border:       rgba(0,0,0,0.09);
 
-  --blue:         #5AA3FF;
-  --blue-btn:     #2E86FF;
-  --teal:         #2ECFA0;
-  --teal-btn:     #1AB887;
-  --purple:       #B47FE8;
-  --purple-btn:   #9B5FD9;
-  --orange:       #FFA040;
-  --orange-btn:   #F08020;
-  --green:        #3DD68C;
-  --red:          #FF5252;
+  --blue:         #1A5FBF;
+  --blue-btn:     #1A5FBF;
+  --teal:         #0F8A60;
+  --teal-btn:     #0F8A60;
+  --purple:       #6B3AB8;
+  --purple-btn:   #6B3AB8;
+  --orange:       #C85A10;
+  --orange-btn:   #C85A10;
+  --green:        #1A7A48;
+  --red:          #C02828;
 }
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
@@ -71,7 +71,7 @@ html,body {
 body::after {
   content:'';
   position:fixed; inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
   pointer-events:none; z-index:9999; opacity:1;
 }
 
@@ -322,13 +322,13 @@ input[type="search"]::-webkit-search-cancel-button { filter:invert(0.5); }
 .btn:disabled { opacity:0.35; pointer-events:none; }
 
 .btn-blue   { background:var(--blue-btn);   color:#fff; }
-.btn-green  { background:var(--green);      color:#061610; }
+.btn-green  { background:var(--green);      color:#fff; }
 .btn-red    { background:var(--red);        color:#fff; }
 .btn-gray   { background:var(--surface-3);  color:var(--text-1); border:1px solid var(--border); }
-.btn-gold   { background:var(--gold);       color:#0D0B09; }
-.btn-teal   { background:var(--teal-btn);   color:#041410; }
+.btn-gold   { background:var(--gold);       color:#fff; }
+.btn-teal   { background:var(--teal-btn);   color:#fff; }
 .btn-purple { background:var(--purple-btn); color:#fff; }
-.btn-orange { background:var(--orange-btn); color:#100600; }
+.btn-orange { background:var(--orange-btn); color:#fff; }
 .btn-sm {
   font-size:0.76rem; min-height:2rem;
   border-radius:0.5rem; width:auto; padding:0 0.875rem;
