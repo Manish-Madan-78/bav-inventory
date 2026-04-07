@@ -21,8 +21,9 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Always network-first — ensures updates are picked up immediately
+  // Always network-first with no-cache — bypasses CDN/browser cache
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(new Request(e.request, { cache: 'no-cache' }))
+      .catch(() => caches.match(e.request))
   );
 });
