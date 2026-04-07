@@ -2,7 +2,7 @@
   "name": "BAV Inventory Manager",
   "short_name": "BAV",
   "description": "Books and Audio Visual inventory management for RSSB Menlo Park",
-  "start_url": "./BAV_Inventory_Form.html",
+  "start_url": "./BAV_App.html",
   "display": "standalone",
   "background_color": "#f5f0e8",
   "theme_color": "#1a1410",

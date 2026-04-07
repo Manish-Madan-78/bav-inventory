@@ -1,6 +1,6 @@
 const CACHE = 'bav-v1';
 const ASSETS = [
-  './BAV_Inventory_Form.html',
+  './BAV_App.html',
   './manifest.json'
 ];
 
