@@ -887,7 +887,9 @@ function saveSettings() {
   localStorage.setItem('bav_script_url', document.getElementById('s-url').value.trim());
   localStorage.setItem('bav_token', document.getElementById('s-token').value.trim());
   closeSettings();
-  showToast('Settings saved', 'success');
+  catalogueLoaded = false;
+  catalogue = [];
+  loadCatalogue(() => showToast('Settings saved — catalogue loaded', 'success'));
 }
 function loadSettings() {
   const u = localStorage.getItem('bav_script_url');
