@@ -1787,9 +1787,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
+// Unregister any existing service workers so caching doesn't block updates
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(err => console.warn('SW registration failed:', err));
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(r => r.unregister());
   });
 }
 </script>
