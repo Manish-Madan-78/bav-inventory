@@ -401,6 +401,35 @@ tr:last-child td { border-bottom:none; }
 .td-price { width:4.5rem; }
 .td-del   { width:2rem; text-align:center; }
 
+/* Corrections card layout */
+.corr-card {
+  background:var(--surface-1);
+  border:1px solid var(--border);
+  border-radius:0.875rem;
+  padding:0.875rem;
+}
+.corr-card.row-dirty { border-color:var(--gold); }
+.corr-title {
+  font-size:0.95rem; font-weight:600;
+  color:var(--text-1); margin-bottom:0.6rem;
+  line-height:1.3;
+}
+.corr-row1 {
+  display:flex; gap:0.5rem; align-items:flex-end;
+}
+.corr-field {
+  display:flex; flex-direction:column; gap:0.2rem; flex:1;
+}
+.corr-field-qty { flex:0 0 4rem; }
+.corr-label {
+  font-size:0.65rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:0.08em;
+  color:var(--text-3);
+}
+.corr-actions {
+  display:flex; gap:0.5rem; margin-top:0.6rem;
+}
+
 .del-btn {
   background:none; border:none; color:var(--red);
   font-size:1.3rem; cursor:pointer; padding:0.25rem;
@@ -1297,26 +1326,33 @@ function renderCorrTable(type, m) {
   const rows = corrRows[type] || [];
   if (!rows.length) { wrap.innerHTML = '<div class="no-data">No entries found for this month</div>'; return; }
   const hasPurch = type === 'purchase';
-  const trs = rows.map((row, i) => `
-    <tr id="crow-${type}-${i}" class="${row.dirty ? 'row-dirty' : ''}">
-      <td><input class="td-input corr-date" type="date" value="${row.date||''}" onchange="markCorrDirty('${type}',${i},this,'date')"></td>
-      <td><input class="td-input corr-code" type="text" value="${esc(row.code||'')}" style="text-transform:uppercase" onchange="markCorrDirty('${type}',${i},this,'code')"></td>
-      <td class="td-title" style="font-size:12px;color:#A0917C;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(row.title||'')}</td>
-      ${hasPurch ? `<td><input class="td-input corr-inv" type="text" value="${esc(row.invoice||'')}" onchange="markCorrDirty('${type}',${i},this,'invoice')"></td>` : ''}
-      <td><input class="td-input corr-qty" type="number" min="1" value="${row.qty||''}" onchange="markCorrDirty('${type}',${i},this,'qty')"></td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-sm btn-green" style="margin-bottom:4px;width:60px" onclick="saveCorrRow('${type}',${i},${m})">Save</button>
-        <button class="btn btn-sm btn-red" style="width:60px" onclick="deleteCorrRow('${type}',${i},${m})">Del</button>
-      </td>
-    </tr>`).join('');
-  wrap.innerHTML = `<div class="items-wrap"><table>
-    <thead><tr>
-      <th class="corr-date">Date</th><th class="corr-code">Code</th><th class="td-title">Title</th>
-      ${hasPurch ? '<th class="corr-inv">Invoice</th>' : ''}
-      <th class="corr-qty">Qty</th><th>Actions</th>
-    </tr></thead>
-    <tbody>${trs}</tbody>
-  </table></div>`;
+  const cards = rows.map((row, i) => `
+    <div id="crow-${type}-${i}" class="corr-card${row.dirty ? ' row-dirty' : ''}">
+      <div class="corr-title">${esc(row.title||'—')}</div>
+      <div class="corr-row1">
+        <div class="corr-field">
+          <label class="corr-label">Date</label>
+          <input class="td-input corr-date" type="date" value="${row.date||''}" onchange="markCorrDirty('${type}',${i},this,'date')">
+        </div>
+        <div class="corr-field">
+          <label class="corr-label">Code</label>
+          <input class="td-input corr-code" type="text" value="${esc(row.code||'')}" style="text-transform:uppercase" onchange="markCorrDirty('${type}',${i},this,'code')">
+        </div>
+        <div class="corr-field corr-field-qty">
+          <label class="corr-label">Qty</label>
+          <input class="td-input corr-qty" type="number" min="1" value="${row.qty||''}" onchange="markCorrDirty('${type}',${i},this,'qty')">
+        </div>
+      </div>
+      ${hasPurch ? `<div class="corr-field" style="margin-top:0.4rem">
+        <label class="corr-label">Invoice</label>
+        <input class="td-input corr-inv" type="text" value="${esc(row.invoice||'')}" onchange="markCorrDirty('${type}',${i},this,'invoice')">
+      </div>` : ''}
+      <div class="corr-actions">
+        <button class="btn btn-sm btn-green" style="flex:1" onclick="saveCorrRow('${type}',${i},${m})">Save</button>
+        <button class="btn btn-sm btn-red" style="flex:1" onclick="deleteCorrRow('${type}',${i},${m})">Delete</button>
+      </div>
+    </div>`).join('');
+  wrap.innerHTML = `<div style="padding:0 14px 80px;display:flex;flex-direction:column;gap:0.75rem">${cards}</div>`;
 }
 
 function markCorrDirty(type, i, input, field) {
