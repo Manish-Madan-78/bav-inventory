@@ -938,7 +938,14 @@ function attachAutocomplete(inputEl, accentColor, onSelect) {
       div.className = 'ac-item';
       div.innerHTML = `<div class="ac-item-row1"><span class="ac-code" style="color:${accentColor}">${esc(item.code)}</span><span class="ac-price">${fmtMoney(item.price)}</span></div><span class="ac-title">${esc(item.title)}</span>`;
       div.addEventListener('mousedown', e => { e.preventDefault(); onSelect(item); closeDD(); });
-      div.addEventListener('touchend', e => { e.preventDefault(); onSelect(item); closeDD(); touchingDD = false; }, { passive: false });
+      let touchStartY = 0;
+      div.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+      div.addEventListener('touchend', e => {
+        const moved = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        if (moved > 10) return; // scroll — ignore
+        e.preventDefault();
+        onSelect(item); closeDD(); touchingDD = false;
+      }, { passive: false });
       dd.appendChild(div);
     });
     wrap.appendChild(dd);
