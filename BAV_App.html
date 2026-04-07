@@ -715,6 +715,10 @@ tr:last-child td { border-bottom:none; }
     <div class="modal-title">Settings</div>
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="input-row" style="padding:0">
+        <label>Script URL</label>
+        <input id="s-url" type="url" placeholder="https://script.google.com/macros/s/…/exec">
+      </div>
+      <div class="input-row" style="padding:0">
         <label>API Token</label>
         <input id="s-token" type="password" placeholder="Enter token">
       </div>
@@ -796,22 +800,45 @@ function setContent(html) {
 }
 
 // ═══════════════════════════════════════════════
-// GAS HELPER
+// GAS HELPER — fetch-based (GitHub Pages compatible)
 // ═══════════════════════════════════════════════
+const GAS_GET_FNS = new Set(['getCatalogue','getInventory','getMonthData','getMonthRows','getSalesAnalytics','fetchRSSBCatalogue']);
+
+// Map google.script.run function names → HTTP action names
+const ACTION_MAP = {
+  logSale: 'sale', logReturn: 'return', logPurchase: 'purchase'
+};
+
 function gas(fn, payload, onSuccess, onError) {
-  if (typeof google === 'undefined') {
-    showToast('Open via the Apps Script deployment URL', 'error');
+  const scriptUrl = localStorage.getItem('bav_script_url') || '';
+  const token = localStorage.getItem('bav_token') || '';
+  if (!scriptUrl) {
+    showToast('Script URL not set — open Settings', 'error', true);
+    hideSpinner();
     return;
   }
-  const runner = google.script.run
-    .withSuccessHandler(res => { if (onSuccess) onSuccess(res); })
-    .withFailureHandler(e => {
-      hideSpinner();
-      if (onError) onError(e);
-      else showToast(e.message || 'An error occurred', 'error');
-    });
-  if (payload !== null && payload !== undefined) runner[fn](payload);
-  else runner[fn]();
+  const action = ACTION_MAP[fn] || fn;
+  const handleError = e => {
+    hideSpinner();
+    if (onError) onError(e);
+    else showToast((e && e.message) || String(e) || 'An error occurred', 'error');
+  };
+  if (GAS_GET_FNS.has(fn)) {
+    // Build query string
+    const params = new URLSearchParams({ action, token });
+    if (fn === 'getMonthData') params.set('month', String(payload ?? 0));
+    else if (fn === 'getMonthRows') { params.set('month', String(payload.month ?? 0)); params.set('type', payload.type || 'sale'); }
+    fetch(`${scriptUrl}?${params}`)
+      .then(r => r.json())
+      .then(res => { if (onSuccess) onSuccess(res); })
+      .catch(handleError);
+  } else {
+    const body = Object.assign({}, payload || {}, { action, token });
+    fetch(scriptUrl, { method: 'POST', body: JSON.stringify(body) })
+      .then(r => r.json())
+      .then(res => { if (onSuccess) onSuccess(res); })
+      .catch(handleError);
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -856,11 +883,14 @@ function hideSpinner() { document.getElementById('spinner').classList.remove('sh
 function openSettings() { document.getElementById('settings-modal').classList.add('show'); }
 function closeSettings() { document.getElementById('settings-modal').classList.remove('show'); }
 function saveSettings() {
-  localStorage.setItem('bav_token', document.getElementById('s-token').value);
+  localStorage.setItem('bav_script_url', document.getElementById('s-url').value.trim());
+  localStorage.setItem('bav_token', document.getElementById('s-token').value.trim());
   closeSettings();
   showToast('Settings saved', 'success');
 }
 function loadSettings() {
+  const u = localStorage.getItem('bav_script_url');
+  if (u) document.getElementById('s-url').value = u;
   const t = localStorage.getItem('bav_token');
   if (t) document.getElementById('s-token').value = t;
 }
