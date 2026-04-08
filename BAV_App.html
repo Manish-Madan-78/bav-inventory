@@ -1010,7 +1010,7 @@ function makeItemRow(type, prefill) {
         </div>
         <button class="del-btn" style="flex-shrink:0;font-size:1.4rem;padding:0 4px" onclick="document.getElementById('${id}').remove();recalcTotal('${type}')">×</button>
       </div>
-      <div class="item-title" style="font-size:12px;color:#A0917C;min-height:1rem;padding:0 2px;line-height:1.4;font-style:italic">${esc(prefill?.title||'')}</div>
+      <div class="item-title" style="font-size:0.85rem;color:var(--text-2);min-height:1rem;padding:0 2px;line-height:1.4;font-weight:500">${esc(prefill?.title||'')}</div>
       <div class="item-field-row">
         <div class="item-field">
           <div class="item-field-label">Qty</div>
@@ -1034,13 +1034,13 @@ function addItemRow(type, prefill) {
   const titleEl = card.querySelector('.item-title');
   attachAutocomplete(codeInput, currentAccentColor(), item => {
     codeInput.value = item.code;
-    titleEl.textContent = item.title;
+    titleEl.innerHTML = `<span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--gold)">${esc(item.code)}</span> ${esc(item.title)}`;
     const priceInput = card.querySelector('.item-price');
     if (priceInput) priceInput.value = item.price;
     recalcTotal(type);
   });
 
-  if (prefill?.code && titleEl) titleEl.textContent = prefill.title || '';
+  if (prefill?.code && titleEl) titleEl.innerHTML = `<span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--gold)">${esc(prefill.code)}</span> ${esc(prefill.title||'')}`;
   if (!prefill?.code) codeInput.focus();
   recalcTotal(type);
 }
@@ -1125,7 +1125,7 @@ function handleOCR(input, type) {
         const isSale = type === 'sale' || type === 'return';
         const mismatch = (isSale && result.docType === 'packing_slip') || (!isSale && result.docType === 'sale_sheet');
         if (mismatch) {
-          warnEl.textContent = `⚠️ This looks like a ${result.docType === 'packing_slip' ? 'packing slip' : 'sale sheet'}, not a ${isSale ? 'sale' : 'purchase'}. Please verify.`;
+          warnEl.textContent = `⚠️ This does not look like a ${isSale ? 'sale sheet' : 'purchase / packing slip'}. Please verify.`;
           warnEl.classList.add('show');
         } else { warnEl.classList.remove('show'); }
       }
@@ -1209,7 +1209,7 @@ function showSaleLog() {
         <div class="form-section-title">Sale Details</div>
         <div class="input-row">
           <label>Date</label>
-          <input id="sale-date" type="date" value="${today()}">
+          <input id="sale-date" type="date" value="${today()}" max="${today()}">
         </div>
       </div>
       ${itemTableHTML('sale')}
@@ -1229,7 +1229,7 @@ function showReturnLog() {
         <div class="form-section-title">Return Details</div>
         <div class="input-row">
           <label>Date</label>
-          <input id="return-date" type="date" value="${today()}">
+          <input id="return-date" type="date" value="${today()}" max="${today()}">
         </div>
       </div>
       ${itemTableHTML('return')}
@@ -1267,7 +1267,7 @@ function showPurchaseLog() {
         <div class="form-section-title">Purchase Details</div>
         <div class="input-row">
           <label>Date</label>
-          <input id="purch-date" type="date" value="${today()}">
+          <input id="purch-date" type="date" value="${today()}" max="${today()}">
         </div>
         <div class="input-row">
           <label>Invoice #</label>
@@ -1328,15 +1328,17 @@ function renderCorrTable(type, m) {
   const hasPurch = type === 'purchase';
   const cards = rows.map((row, i) => `
     <div id="crow-${type}-${i}" class="corr-card${row.dirty ? ' row-dirty' : ''}">
-      <div class="corr-title">${esc(row.title||'—')}</div>
+      <div class="corr-field" style="margin-bottom:0.5rem">
+        <label class="corr-label">Book Title</label>
+        <div class="ac-wrap" style="position:relative">
+          <input class="td-input corr-title-input" id="corr-title-${type}-${i}" type="text" value="${esc(row.title||'')}" placeholder="Search title or code…" autocomplete="off">
+        </div>
+        <div class="corr-code-display" id="corr-code-display-${type}-${i}" style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--gold);margin-top:0.25rem;min-height:1rem">${esc(row.code||'')}</div>
+      </div>
       <div class="corr-row1">
         <div class="corr-field">
           <label class="corr-label">Date</label>
-          <input class="td-input corr-date" type="date" value="${row.date||''}" onchange="markCorrDirty('${type}',${i},this,'date')">
-        </div>
-        <div class="corr-field">
-          <label class="corr-label">Code</label>
-          <input class="td-input corr-code" type="text" value="${esc(row.code||'')}" style="text-transform:uppercase" onchange="markCorrDirty('${type}',${i},this,'code')">
+          <input class="td-input corr-date" id="corr-date-${type}-${i}" type="date" value="${row.date||''}" max="${today()}" onchange="markCorrDirty('${type}',${i},this,'date')">
         </div>
         <div class="corr-field corr-field-qty">
           <label class="corr-label">Qty</label>
@@ -1353,6 +1355,21 @@ function renderCorrTable(type, m) {
       </div>
     </div>`).join('');
   wrap.innerHTML = `<div style="padding:0 14px 80px;display:flex;flex-direction:column;gap:0.75rem">${cards}</div>`;
+
+  // Wire up autocomplete for each correction card
+  rows.forEach((row, i) => {
+    const titleInput = document.getElementById(`corr-title-${type}-${i}`);
+    const codeDisplay = document.getElementById(`corr-code-display-${type}-${i}`);
+    if (!titleInput) return;
+    attachAutocomplete(titleInput, type === 'purchase' ? 'var(--teal)' : 'var(--blue)', item => {
+      titleInput.value = item.title;
+      codeDisplay.textContent = item.code;
+      corrRows[type][i].title = item.title;
+      corrRows[type][i].code = item.code;
+      corrRows[type][i].dirty = true;
+      document.getElementById(`crow-${type}-${i}`)?.classList.add('row-dirty');
+    });
+  });
 }
 
 function markCorrDirty(type, i, input, field) {
