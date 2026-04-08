@@ -1489,12 +1489,19 @@ function renderStockTable() {
   if (stockFilter !== 'all') items = items.filter(x => getCategory(x.code) === stockFilter);
   if (stockLowOnly) items = items.filter(x => (x.currentInv||0) <= 1);
   if (!items.length) { wrap.innerHTML = '<div class="no-data">No items match</div>'; return; }
+  // Filter out any spreadsheet header rows
+  items = items.filter(x => x.code.toLowerCase() !== 'code' && x.title.toLowerCase() !== 'title');
+  if (!items.length) { wrap.innerHTML = '<div class="no-data">No items match</div>'; return; }
   const rows = items.map(item => {
     const qty = item.currentInv || 0;
     const badge = qty === 0 ? '<span class="badge badge-out">OUT</span>' : qty <= 1 ? `<span class="badge badge-low">${qty}</span>` : `<span class="badge badge-ok">${qty}</span>`;
-    return `<tr><td style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#B47FE8">${esc(item.code)}</td><td style="font-size:13px">${esc(item.title)}</td><td>${badge}</td></tr>`;
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:0.82rem;font-weight:500;color:#B47FE8;white-space:nowrap;width:6rem">${esc(item.code)}</td>
+      <td style="font-size:0.88rem;word-break:break-word">${esc(item.title)}</td>
+      <td style="width:3rem;text-align:center">${badge}</td>
+    </tr>`;
   }).join('');
-  wrap.innerHTML = `<table><thead><tr><th>Code</th><th>Title</th><th>Stock</th></tr></thead><tbody>${rows}</tbody></table>`;
+  wrap.innerHTML = `<table style="table-layout:fixed;width:100%"><thead><tr><th style="width:6rem">Code</th><th>Title</th><th style="width:3rem">Stock</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 // MONTHLY VIEW
