@@ -1675,8 +1675,8 @@ function renderAnalytics() {
   const rows = items.map(item => {
     const inv = item.currentInv || 0;
     const badge = inv === 0 ? '<span class="badge badge-out">0</span>' : inv <= 1 ? `<span class="badge badge-low">${inv}</span>` : inv;
-    const mCols = mkeys.map(k => `<td style="text-align:center;font-size:12px;font-family:'DM Mono',monospace">${item.months?.[k] || '–'}</td>`).join('');
-    return `<tr><td style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#B47FE8;white-space:nowrap">${esc(item.code)}</td><td style="font-size:12px;min-width:100px">${esc(item.title)}</td><td style="text-align:center;font-weight:700;font-family:'DM Mono',monospace">${item.total||0}</td>${mCols}<td style="text-align:center">${badge}</td></tr>`;
+    const mCols = mkeys.map(k => `<td style="text-align:center;font-size:0.82rem;font-family:'DM Mono',monospace">${item.months?.[k] || '–'}</td>`).join('');
+    return `<tr><td style="font-family:'DM Mono',monospace;font-size:0.82rem;font-weight:500;color:#B47FE8;white-space:nowrap">${esc(item.code)}</td><td style="font-size:0.82rem;min-width:100px">${esc(item.title)}</td><td style="text-align:center;font-weight:700;font-size:0.82rem;font-family:'DM Mono',monospace">${item.total||0}</td>${mCols}<td style="text-align:center">${badge}</td></tr>`;
   }).join('');
   wrap.innerHTML = `<div class="items-wrap"><table>
     <thead><tr><th>Code</th><th>Title</th><th>Total</th>${mkeys.map(k=>`<th>${k}</th>`).join('')}<th>Stock</th></tr></thead>
