@@ -495,11 +495,9 @@ tr:last-child td { border-bottom:none; }
    FILTER PILLS
 ═══════════════════════════════════════ */
 .filter-bar {
-  display:flex; gap:0.4rem; overflow-x:auto;
+  display:flex; flex-wrap:wrap; gap:0.4rem;
   padding:0.875rem 0.875rem 0.4rem;
-  scrollbar-width:none;
 }
-.filter-bar::-webkit-scrollbar { display:none; }
 
 .pill {
   padding:0.38rem 0.875rem;
